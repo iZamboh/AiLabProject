@@ -3,7 +3,7 @@ import torch.nn as nn
 import math
 
 class Seq2SeqTransformer(nn.Module):
-    def __init__(self, src_vocab_size, tgt_vocab_size, d_model=256, nhead=4, num_layers=3, dropout=0.1):
+    def __init__(self, src_vocab_size, tgt_vocab_size, d_model=256, nhead=4, num_layers=3, dropout=0.1):  # Cambbiato d_model da 256 a 512, nhead da 4 a 8, num_layers da 2 a 4
         super(Seq2SeqTransformer, self).__init__()
 
         self.src_tok_emb = nn.Embedding(src_vocab_size, d_model)
@@ -62,8 +62,7 @@ class PositionalEncoding(nn.Module):
 
         pe = torch.zeros(max_len, d_model)
         position = torch.arange(0, max_len).unsqueeze(1).float()
-        div_term = torch.exp(torch.arange(0, d_model, 2).float() * 
-                           (-math.log(10000.0) / d_model))
+        div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
         
         pe[:, 0::2] = torch.sin(position * div_term)
         pe[:, 1::2] = torch.cos(position * div_term)

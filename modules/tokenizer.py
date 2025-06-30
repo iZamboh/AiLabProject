@@ -36,7 +36,7 @@ if __name__ == "__main__":
     if os.path.exists("tokenizer.json"):
         bpe_tokenizer.load()
     else:
-        bpe_tokenizer.train(["data/train.en", "data/train.it"])
+        bpe_tokenizer.train(["data/train_mini.en", "data/train_mini.it"])
 
     test = "Hello world!"
     encoded = bpe_tokenizer.encode(test)

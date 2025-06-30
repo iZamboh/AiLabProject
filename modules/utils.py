@@ -1,6 +1,6 @@
 import torch
 from torch.nn.utils.rnn import pad_sequence
-import tqdm
+from tqdm import tqdm
 
 # Prende frasi con lunghezze diverse e le padda (riempie con zeri) per creare batch uniformi.
 def collate_fn(batch):

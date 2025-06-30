@@ -23,6 +23,8 @@ EPOCHS = 10 # Numero di epoche per il training
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu") # Imposta il dispositivo per il training (GPU se disponibile, altrimenti CPU)
 CHECKPOINT_DIR = "checkpoints"  # Directory per salvare i checkpoint
 SAVE_EVERY = 2  # Salva checkpoint ogni N epoche
+PATIENCE = 3  # Numero di epoche senza miglioramento prima di fermare l'allenamento
+DATA_LIMIT = 0.05  # Percentuale di dati da utilizzare (1.0 = 100%, 0.5 = 50%, etc.)
 
 # Crea directory per i checkpoint
 os.makedirs(CHECKPOINT_DIR, exist_ok=True)
@@ -59,9 +61,9 @@ vocab_size = tokenizer.vocab_size
 model = Seq2SeqTransformer(vocab_size, vocab_size).to(DEVICE)
 
 # Ottimizzatore, loss e scheduler
-optimizer = optim.Adam(model.parameters(), lr=0.0005)
-criterion = nn.CrossEntropyLoss(ignore_index=0)
-scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=2, factor=0.5)
+optimizer = optim.AdamW(model.parameters(), lr=0.0005)
+criterion = nn.CrossEntropyLoss(ignore_index=0, label_smoothing=0.1)
+scheduler = ReduceLROnPlateau(optimizer, mode='min', patience = PATIENCE, factor=0.5)
 
 # Training loop
 print("\nInizio training...")
@@ -133,16 +135,15 @@ for epoch in range(EPOCHS):
         scheduler.step(avg_train_loss)
         current_loss = avg_train_loss
     
-    # Salva checkpoint periodicamente
-    if (epoch + 1) % SAVE_EVERY == 0:
-        utils.save_checkpoint(
-            epoch, model, optimizer, current_loss, scheduler, vocab_size,
-            os.path.join(CHECKPOINT_DIR, f'checkpoint_epoch_{epoch+1}.pth')
-        )
+    # Salva checkpoint 
+    utils.save_checkpoint(
+        epoch, model, optimizer, current_loss, scheduler, vocab_size,
+        os.path.join(CHECKPOINT_DIR, f'checkpoint_epoch_{epoch+1}.pth')
+    )
     
     # Stampa learning rate corrente
     current_lr = optimizer.param_groups[0]['lr']
-    print(f"  Learning Rate: {current_lr:.6f}")
+    print(f"Learning Rate: {current_lr:.6f}")
     
     # Libera memoria GPU alla fine dell'epoca
     if DEVICE.type == 'cuda':
