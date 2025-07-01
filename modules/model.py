@@ -3,7 +3,7 @@ import torch.nn as nn
 import math
 
 class Seq2SeqTransformer(nn.Module):
-    def __init__(self, src_vocab_size, tgt_vocab_size, d_model=256, nhead=4, num_layers=3, dropout=0.1):  # Cambbiato d_model da 256 a 512, nhead da 4 a 8, num_layers da 2 a 4
+    def __init__(self, src_vocab_size, tgt_vocab_size, d_model=256, nhead=4, num_layers=3, dropout=0.1):  # Cambiato d_model da 256 a 512, nhead da 4 a 8, num_layers da 2 a 4
         super(Seq2SeqTransformer, self).__init__()
 
         self.src_tok_emb = nn.Embedding(src_vocab_size, d_model)

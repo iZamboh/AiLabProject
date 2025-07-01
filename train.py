@@ -10,6 +10,7 @@ from tqdm import tqdm
 import os
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 import modules.utils as utils
+import modules.model3 as model3
 
 # Configurazione
 SRC_PATH = "data/train.en" # Percorso del file di testo in lingua di origine
@@ -19,7 +20,7 @@ VAL_TGT_PATH = "data/val.it" # Percorso del file di testo di validazione in ling
 TOKENIZER_PATH = "tokenizer.json" # Percorso del file del tokenizer
 MAX_LENGTH = 128 # Lunghezza massima delle sequenze
 BATCH_SIZE = 32 # Dimensione del batch
-EPOCHS = 10 # Numero di epoche per il training
+EPOCHS = 15 # Numero di epoche per il training
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu") # Imposta il dispositivo per il training (GPU se disponibile, altrimenti CPU)
 CHECKPOINT_DIR = "checkpoints"  # Directory per salvare i checkpoint
 SAVE_EVERY = 2  # Salva checkpoint ogni N epoche
@@ -58,7 +59,8 @@ print(f"Numero di batch per epoca: {len(train_dataloader)}")
 
 # Modello
 vocab_size = tokenizer.vocab_size
-model = Seq2SeqTransformer(vocab_size, vocab_size).to(DEVICE)
+#model = Seq2SeqTransformer(vocab_size, vocab_size).to(DEVICE)
+model = model3.create_small_model(vocab_size).to(DEVICE)  # Usa il modello più piccolo per il training
 
 # Ottimizzatore, loss e scheduler
 optimizer = optim.AdamW(model.parameters(), lr=0.0005)
