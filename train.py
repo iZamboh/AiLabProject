@@ -146,6 +146,37 @@ for epoch in range(EPOCHS):
     # Stampa learning rate corrente
     current_lr = optimizer.param_groups[0]['lr']
     print(f"Learning Rate: {current_lr:.6f}")
+
+    with torch.no_grad():
+        model.eval()
+        # Prendi un batch dal val_dataloader (o il primo batch)
+        src, tgt = next(iter(val_dataloader))
+        src = src.to(DEVICE)
+        tgt = tgt.to(DEVICE)
+
+        # Assumiamo che la prima frase del batch venga decodificata
+        src_sample = src[0].unsqueeze(0)
+        tgt_sample = tgt[0]
+
+        start_symbol = tokenizer.tokenizer.token_to_id("<s>")
+        max_len = 50  # max lunghezza predizione
+
+        # Crea maschera padding per l'encoder
+        src_mask = model.create_padding_mask(src_sample).to(DEVICE)
+
+        # Decodifica con greedy decoding
+        predicted_ids = utils.greedy_decode(model, src_sample, src_mask, max_len, start_symbol, tokenizer, DEVICE)
+
+        # Decodifica testo
+        src_text = tokenizer.decode(src_sample[0].tolist())
+        tgt_text = tokenizer.decode(tgt_sample.tolist())
+        pred_text = tokenizer.decode(predicted_ids.tolist())
+
+        print("\n--- Esempio di predizione ---")
+        print(f"Input (src): {src_text}")
+        print(f"Target (tgt): {tgt_text}")
+        print(f"Predizione  : {pred_text}")
+        print("-----------------------------\n")
     
     # Libera memoria GPU alla fine dell'epoca
     if DEVICE.type == 'cuda':

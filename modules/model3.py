@@ -255,7 +255,7 @@ def create_small_model(vocab_size):
         num_encoder_layers=2,
         num_decoder_layers=2,
         dim_feedforward=512,
-        dropout=0.1
+        dropout=0.4
     )
 
 def create_medium_model(vocab_size):

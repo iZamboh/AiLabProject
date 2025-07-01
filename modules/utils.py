@@ -50,3 +50,26 @@ def validate_model(model, val_dataloader, criterion, device):
             total_samples += src.size(0)
     
     return val_loss / len(val_dataloader)
+
+def greedy_decode(model, src, src_mask, max_len, start_symbol, tokenizer, device):
+    # Codifica la sorgente
+    memory = model.encode(src, src_key_padding_mask=src_mask)
+
+    # Inizializza la sequenza di output con solo il token di inizio frase
+    ys = torch.ones((1, 1), dtype=torch.long, device=device) * start_symbol
+
+    for _ in range(max_len - 1):
+        # Decodifica step-by-step
+        out = model.decode(ys, memory, memory_key_padding_mask=src_mask)
+        out = out[:, -1, :]  # prende solo l'ultima predizione
+        prob = torch.argmax(out, dim=-1)
+        prob = prob.unsqueeze(0)  # aggiunge dimensione per concatenazione
+
+        # Concatena il token predetto alla sequenza in costruzione
+        ys = torch.cat([ys, prob], dim=1)
+
+        # Interrompe se ha predetto il token di fine frase
+        if prob.item() == tokenizer.tokenizer.token_to_id("</s>"):
+            break
+
+    return ys.squeeze(0)

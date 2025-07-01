@@ -6,7 +6,7 @@ class BPETokenizer:
         self.vocab_size = vocab_size
         self.special_tokens = special_tokens
         self.tokenizer = Tokenizer(models.BPE())
-        self.tokenizer.pre_tokenizer = pre_tokenizers.Whitespace()
+        self.tokenizer.pre_tokenizer = pre_tokenizers.Metaspace()
 
     #Funzione per allenare il tokenizzatore leggendo i testi da file
     def train(self, files, output_path="tokenizer.json"):
